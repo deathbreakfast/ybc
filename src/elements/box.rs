@@ -1,5 +1,4 @@
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct BoxProps {
@@ -12,32 +11,27 @@ pub struct BoxProps {
 /// A white box to contain other elements.
 ///
 /// [https://bulma.io/documentation/elements/box/](https://bulma.io/documentation/elements/box/)
-pub struct Box {
-    props: BoxProps,
-}
+pub struct Box;
 
 impl Component for Box {
     type Message = ();
     type Properties = BoxProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("box");
-        classes.push(&self.props.classes);
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let BoxProps { children, classes } = ctx.props();
+        let mut box_classes = Classes::from("box");
+        box_classes.push(classes);
         html! {
-            <div class=classes>
-                {self.props.children.clone()}
+            <div class={box_classes}>
+                {children.clone()}
             </div>
         }
     }

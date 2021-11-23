@@ -1,6 +1,5 @@
 use derive_more::Display;
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct HeroProps {
@@ -42,62 +41,68 @@ pub struct HeroProps {
 /// An imposing hero banner to showcase something.
 ///
 /// [https://bulma.io/documentation/layout/hero/](https://bulma.io/documentation/layout/hero/)
-pub struct Hero {
-    props: HeroProps,
-}
+pub struct Hero;
 
 impl Component for Hero {
     type Message = ();
     type Properties = HeroProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("hero");
-        classes.push(&self.props.classes);
-        if self.props.fixed_nav {
-            classes.push("is-fullheight-with-navbar");
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let HeroProps {
+            classes,
+            bold,
+            body,
+            body_classes,
+            fixed_nav,
+            foot,
+            foot_classes,
+            head,
+            head_classes,
+            size,
+        } = ctx.props();
+        let mut hero_classes = Classes::from("hero");
+        hero_classes.push(classes);
+        if *fixed_nav {
+            hero_classes.push("is-fullheight-with-navbar");
         }
-        if self.props.bold {
-            classes.push("is-bold");
+        if *bold {
+            hero_classes.push("is-bold");
         }
-        if let Some(size) = &self.props.size {
-            classes.push(&size.to_string());
+        if let Some(size) = &size {
+            hero_classes.push(&size.to_string());
         }
 
         // Build the header section.
-        let head = if let Some(head) = &self.props.head {
+        let head = if let Some(head) = &head {
             let mut classes = Classes::from("hero-head");
-            classes.push(&self.props.head_classes);
-            html! {<div class=classes>{head.clone()}</div>}
+            classes.push(head_classes);
+            html! {<div class={classes}>{head.clone()}</div>}
         } else {
             html! {}
         };
         // Build the footer section.
-        let foot = if let Some(foot) = &self.props.foot {
+        let foot = if let Some(foot) = &foot {
             let mut classes = Classes::from("hero-foot");
-            classes.push(&self.props.foot_classes);
-            html! {<div class=classes>{foot.clone()}</div>}
+            classes.push(foot_classes);
+            html! {<div class={classes}>{foot.clone()}</div>}
         } else {
             html! {}
         };
 
-        let mut body_classes = Classes::from("hero-body");
-        body_classes.push(&self.props.body_classes);
+        let mut bclasses = Classes::from("hero-body");
+        bclasses.push(body_classes);
         html! {
-            <section class=classes>
+            <section class={hero_classes}>
                 {head}
-                <div class=body_classes>{self.props.body.clone()}</div>
+                <div class={bclasses}>{body.clone()}</div>
                 {foot}
             </section>
         }

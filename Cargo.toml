@@ -13,13 +13,12 @@ keywords = ["wasm", "web", "bulma", "sass", "yew"]
 [dependencies]
 derive_more = "0.99.9"
 web-sys = { version="0.3", features=["Element", "File", "HtmlCollection", "HtmlSelectElement"] }
-yew = { version="0.18.0", features=["web_sys"] }
+yew = { git="https://github.com/yewstack/yew" }
+yew-agent = { git="https://github.com/yewstack/yew" }
 yewtil = { version="0.4.0", features=["neq"] }
-yew-router = { version="0.15.0", features=["web_sys"], optional=true }
+wasm-bindgen = "0.2"
 
 [features]
-default = ["router"]
-router = ["yew-router"]
 docinclude = [] # Used only for activating `doc(include="...")` on nightly.
 
 [package.metadata.docs.rs]

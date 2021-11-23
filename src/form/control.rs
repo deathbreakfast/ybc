@@ -1,7 +1,6 @@
 #![allow(clippy::redundant_closure_call)]
 
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct ControlProps {
@@ -20,36 +19,31 @@ pub struct ControlProps {
 /// A container with which you can wrap the form controls.
 ///
 /// [https://bulma.io/documentation/form/general/](https://bulma.io/documentation/form/general/)
-pub struct Control {
-    props: ControlProps,
-}
+pub struct Control;
 
 impl Component for Control {
     type Message = ();
     type Properties = ControlProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("control");
-        classes.push(&self.props.classes);
-        if self.props.expanded {
-            classes.push("is-expanded");
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let ControlProps { children, classes, expanded, tag } = ctx.props();
+        let mut control_classes = Classes::from("control");
+        control_classes.push(classes);
+        if *expanded {
+            control_classes.push("is-expanded");
         }
-        let tag = self.props.tag.clone();
+        let tag = tag.clone();
         html! {
-            <@{tag} class=classes>
-                {self.props.children.clone()}
+            <@{tag} class={control_classes}>
+                {children.clone()}
             </@>
         }
     }

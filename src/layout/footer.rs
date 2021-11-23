@@ -1,5 +1,4 @@
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct FooterProps {
@@ -12,32 +11,27 @@ pub struct FooterProps {
 /// A simple responsive footer which can include anything.
 ///
 /// [https://bulma.io/documentation/layout/footer/](https://bulma.io/documentation/layout/footer/)
-pub struct Footer {
-    props: FooterProps,
-}
+pub struct Footer;
 
 impl Component for Footer {
     type Message = ();
     type Properties = FooterProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("footer");
-        classes.push(&self.props.classes);
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let FooterProps { children, classes } = ctx.props();
+        let mut footer_classes = Classes::from("footer");
+        footer_classes.push(classes);
         html! {
-            <footer class=classes>
-                {self.props.children.clone()}
+            <footer class={footer_classes}>
+                {children.clone()}
             </footer>
         }
     }

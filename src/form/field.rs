@@ -1,6 +1,5 @@
 use derive_more::Display;
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct FieldProps {
@@ -50,70 +49,81 @@ pub struct FieldProps {
 }
 
 /// A container for form controls
-pub struct Field {
-    props: FieldProps,
-}
+pub struct Field;
 
 impl Component for Field {
     type Message = ();
     type Properties = FieldProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("field");
-        classes.push(&self.props.classes);
-        if self.props.icons_left {
-            classes.push("has-icons-left");
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let FieldProps {
+            children,
+            classes,
+            horizontal,
+            addons_align,
+            label_classes,
+            help_has_error,
+            icons_left,
+            help,
+            help_classes,
+            icons_right,
+            multiline,
+            label,
+            addons,
+            grouped,
+            grouped_align,
+        } = ctx.props();
+        let mut field_classes = Classes::from("field");
+        field_classes.push(classes);
+        if *icons_left {
+            field_classes.push("has-icons-left");
         }
-        if self.props.icons_right {
-            classes.push("has-icons-right");
+        if *icons_right {
+            field_classes.push("has-icons-right");
         }
-        if self.props.addons {
-            classes.push("has-addons");
+        if *addons {
+            field_classes.push("has-addons");
         }
-        if let Some(align) = &self.props.addons_align {
-            classes.push(&align.to_string());
+        if let Some(align) = &addons_align {
+            field_classes.push(&align.to_string());
         }
-        if self.props.grouped {
-            classes.push("is-grouped");
+        if *grouped {
+            field_classes.push("is-grouped");
         }
-        if let Some(align) = &self.props.grouped_align {
-            classes.push(&align.to_string());
+        if let Some(align) = &grouped_align {
+            field_classes.push(&align.to_string());
         }
-        if self.props.multiline {
-            classes.push("is-grouped-multiline");
+        if *multiline {
+            field_classes.push("is-grouped-multiline");
         }
 
         // Build the label if label content is provided.
-        let label = match &self.props.label {
-            Some(label_content) => match &self.props.label_classes {
+        let label = match &label {
+            Some(label_content) => match &label_classes {
                 Some(label_classes_str) => {
                     let mut label_classes = label_classes_str.clone();
-                    if self.props.horizontal {
+                    if *horizontal {
                         label_classes.push("field-label");
                         html! {
-                            <div class=label_classes>
+                            <div class={label_classes}>
                                 <label class="label">{label_content.clone()}</label>
                             </div>
                         }
                     } else {
                         label_classes.push("label");
-                        html! {<label class=label_classes>{label_content.clone()}</label>}
+                        html! {<label class={label_classes}>{label_content.clone()}</label>}
                     }
                 }
                 None => {
-                    if self.props.horizontal {
+                    if *horizontal {
                         html! {<div class="field-label"><label class="label">{label_content.clone()}</label></div>}
                     } else {
                         html! {<label class="label">{label_content.clone()}</label>}
@@ -124,35 +134,35 @@ impl Component for Field {
         };
 
         // Build the help label if present.
-        let help = match &self.props.help {
-            Some(help_content) => match &self.props.help_classes {
+        let help = match &help {
+            Some(help_content) => match &help_classes {
                 Some(help_classes_str) => {
                     let mut help_classes = help_classes_str.clone();
                     help_classes.push("help");
-                    if self.props.help_has_error {
+                    if *help_has_error {
                         help_classes.push("is-danger");
                     }
-                    html! {<label class=help_classes>{help_content.clone()}</label>}
+                    html! {<label class={help_classes}>{help_content.clone()}</label>}
                 }
                 None => {
                     let mut help_classes = Classes::from("help");
-                    if self.props.help_has_error {
+                    if *help_has_error {
                         help_classes.push("is-danger");
                     }
-                    html! {<label class=help_classes>{help_content.clone()}</label>}
+                    html! {<label class={help_classes}>{help_content.clone()}</label>}
                 }
             },
             None => html! {},
         };
 
         // Build the body section.
-        let mut body = html! {<>{self.props.children.clone()}</>};
-        if self.props.horizontal {
-            body = html! {<div class="field-body">{body}</div>}
+        let mut body = html! {<>{children.clone()}</>};
+        if *horizontal {
+            body = html! {<div class={"field-body"}>{body}</div>}
         }
 
         html! {
-            <div class=classes>
+            <div class={field_classes}>
                 {label}
                 {body}
                 {help}

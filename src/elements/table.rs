@@ -1,5 +1,4 @@
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct TableProps {
@@ -30,56 +29,60 @@ pub struct TableProps {
 /// An HTML table component.
 ///
 /// [https://bulma.io/documentation/elements/table/](https://bulma.io/documentation/elements/table/)
-pub struct Table {
-    props: TableProps,
-}
+pub struct Table;
 
 impl Component for Table {
     type Message = ();
     type Properties = TableProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("table");
-        classes.push(&self.props.classes);
-        if self.props.bordered {
-            classes.push("is-bordered");
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let TableProps {
+            children,
+            classes,
+            bordered,
+            narrow,
+            hoverable,
+            fullwidth,
+            scrollable,
+            striped,
+        } = ctx.props();
+        let mut table_classes = Classes::from("table");
+        table_classes.push(classes);
+        if *bordered {
+            table_classes.push("is-bordered");
         }
-        if self.props.striped {
-            classes.push("is-striped");
+        if *striped {
+            table_classes.push("is-striped");
         }
-        if self.props.narrow {
-            classes.push("is-narrow");
+        if *narrow {
+            table_classes.push("is-narrow");
         }
-        if self.props.hoverable {
-            classes.push("is-hoverable");
+        if *hoverable {
+            table_classes.push("is-hoverable");
         }
-        if self.props.fullwidth {
-            classes.push("is-fullwidth");
+        if *fullwidth {
+            table_classes.push("is-fullwidth");
         }
-        if self.props.scrollable {
+        if *scrollable {
             html! {
                 <div class="table-container">
-                    <table class=classes>
-                        {self.props.children.clone()}
+                    <table class={table_classes}>
+                        {children.clone()}
                     </table>
                 </div>
             }
         } else {
             html! {
-                <table class=classes>
-                    {self.props.children.clone()}
+                <table class={table_classes}>
+                    {children.clone()}
                 </table>
             }
         }

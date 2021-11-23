@@ -2,7 +2,6 @@
 
 use derive_more::Display;
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct TileProps {
@@ -17,7 +16,7 @@ pub struct TileProps {
     ///
     /// https://bulma.io/documentation/layout/tiles/#modifiers
     #[prop_or_default]
-    pub ctx: Option<TileCtx>,
+    pub tile_ctx: Option<TileCtx>,
     /// Stack tiles vertically.
     ///
     /// https://bulma.io/documentation/layout/tiles/#modifiers
@@ -33,41 +32,36 @@ pub struct TileProps {
 /// A single tile element to build 2-dimensional whatever-you-like grids.
 ///
 /// [https://bulma.io/documentation/layout/tiles/](https://bulma.io/documentation/layout/tiles/)
-pub struct Tile {
-    props: TileProps,
-}
+pub struct Tile;
 
 impl Component for Tile {
     type Message = ();
     type Properties = TileProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("tile");
-        classes.push(&self.props.classes);
-        if let Some(ctx) = &self.props.ctx {
-            classes.push(&ctx.to_string());
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let TileProps { children, classes, vertical, size, tag, tile_ctx } = ctx.props();
+        let mut tile_classes = Classes::from("tile");
+        tile_classes.push(classes);
+        if let Some(ctx) = &tile_ctx {
+            tile_classes.push(&ctx.to_string());
         }
-        if self.props.vertical {
-            classes.push("is-vertical");
+        if *vertical {
+            tile_classes.push("is-vertical");
         }
-        if let Some(size) = &self.props.size {
-            classes.push(&size.to_string());
+        if let Some(size) = &size {
+            tile_classes.push(&size.to_string());
         }
         html! {
-            <@{self.props.tag.clone()} class=classes>
-                {self.props.children.clone()}
+            <@{tag.clone()} class={tile_classes}>
+                {children.clone()}
             </@>
         }
     }

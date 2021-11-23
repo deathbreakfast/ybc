@@ -1,7 +1,6 @@
 #![allow(clippy::redundant_closure_call)]
 
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct MediaProps {
@@ -17,32 +16,27 @@ pub struct MediaProps {
 /// A UI element for repeatable and nestable content.
 ///
 /// [https://bulma.io/documentation/layout/media-object/](https://bulma.io/documentation/layout/media-object/)
-pub struct Media {
-    props: MediaProps,
-}
+pub struct Media;
 
 impl Component for Media {
     type Message = ();
     type Properties = MediaProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("media");
-        classes.push(&self.props.classes);
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let MediaProps { children, classes, tag } = ctx.props();
+        let mut media_classes = Classes::from("media");
+        media_classes.push(classes);
         html! {
-            <@{self.props.tag.clone()} class=classes>
-                {self.props.children.clone()}
+            <@{tag.clone()} class={media_classes}>
+                {children.clone()}
             </@>
         }
     }
@@ -65,32 +59,27 @@ pub struct MediaLeftProps {
 /// Elements to be grouped to the left of the media container.
 ///
 /// [https://bulma.io/documentation/layout/media-object/](https://bulma.io/documentation/layout/media-object/)
-pub struct MediaLeft {
-    props: MediaLeftProps,
-}
+pub struct MediaLeft;
 
 impl Component for MediaLeft {
     type Message = ();
     type Properties = MediaLeftProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("media-left");
-        classes.push(&self.props.classes);
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let MediaLeftProps { children, classes, tag } = ctx.props();
+        let mut media_classes = Classes::from("media-left");
+        media_classes.push(classes);
         html! {
-            <@{self.props.tag.clone()} class=classes>
-                {self.props.children.clone()}
+            <@{tag.clone()} class={media_classes}>
+                {children.clone()}
             </@>
         }
     }
@@ -113,32 +102,27 @@ pub struct MediaRightProps {
 /// Elements to be grouped to the right of the media container.
 ///
 /// [https://bulma.io/documentation/layout/media-object/](https://bulma.io/documentation/layout/media-object/)
-pub struct MediaRight {
-    props: MediaRightProps,
-}
+pub struct MediaRight;
 
 impl Component for MediaRight {
     type Message = ();
     type Properties = MediaRightProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("media-right");
-        classes.push(&self.props.classes);
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let MediaRightProps { children, classes, tag } = ctx.props();
+        let mut media_classes = Classes::from("media-right");
+        media_classes.push(classes);
         html! {
-            <@{self.props.tag.clone()} class=classes>
-                {self.props.children.clone()}
+            <@{tag.clone()} class={media_classes}>
+                {children.clone()}
             </@>
         }
     }
@@ -161,32 +145,23 @@ pub struct MediaContentProps {
 /// Elements to be grouped as the center body of the media container.
 ///
 /// [https://bulma.io/documentation/layout/media-object/](https://bulma.io/documentation/layout/media-object/)
-pub struct MediaContent {
-    props: MediaContentProps,
-}
+pub struct MediaContent;
 
 impl Component for MediaContent {
     type Message = ();
     type Properties = MediaContentProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
-        false
-    }
-
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("media-content");
-        classes.push(&self.props.classes);
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let MediaContentProps { children, classes, tag } = ctx.props();
+        let mut media_classes = Classes::from("media-content");
+        media_classes.push(classes);
         html! {
-            <@{self.props.tag.clone()} class=classes>
-                {self.props.children.clone()}
+            <@{tag.clone()} class={media_classes}>
+                {children.clone()}
             </@>
         }
     }

@@ -2,7 +2,6 @@
 
 use yew::events::MouseEvent;
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct PanelProps {
@@ -18,33 +17,28 @@ pub struct PanelProps {
 /// A composable panel, for compact controls.
 ///
 /// [https://bulma.io/documentation/components/panel/](https://bulma.io/documentation/components/panel/)
-pub struct Panel {
-    props: PanelProps,
-}
+pub struct Panel;
 
 impl Component for Panel {
     type Message = ();
     type Properties = PanelProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("panel");
-        classes.push(&self.props.classes);
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let PanelProps { children, classes, heading } = ctx.props();
+        let mut panel_classes = Classes::from("panel");
+        panel_classes.push(classes);
         html! {
-            <nav class=classes>
-                <p class="panel-heading">{self.props.heading.clone()}</p>
-                {self.props.children.clone()}
+            <nav class={panel_classes}>
+                <p class="panel-heading">{heading.clone()}</p>
+                {children.clone()}
             </nav>
         }
     }
@@ -62,30 +56,24 @@ pub struct PanelTabsProps {
 /// A container for the navigation tabs of a panel.
 ///
 /// [https://bulma.io/documentation/components/panel/](https://bulma.io/documentation/components/panel/)
-pub struct PanelTabs {
-    props: PanelTabsProps,
-}
+pub struct PanelTabs;
 
 impl Component for PanelTabs {
     type Message = ();
     type Properties = PanelTabsProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
             <p class="panel-tabs">
-                {self.props.children.clone()}
+                {ctx.props().children.clone()}
             </p>
         }
     }
@@ -112,35 +100,30 @@ pub struct PanelBlockProps {
 /// An individual element of the panel.
 ///
 /// [https://bulma.io/documentation/components/panel/](https://bulma.io/documentation/components/panel/)
-pub struct PanelBlock {
-    props: PanelBlockProps,
-}
+pub struct PanelBlock;
 
 impl Component for PanelBlock {
     type Message = ();
     type Properties = PanelBlockProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("panel-block");
-        if self.props.active {
-            classes.push("is-active");
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let PanelBlockProps { active, children, onclick, tag } = ctx.props();
+        let mut panel_classes = Classes::from("panel-block");
+        if *active {
+            panel_classes.push("is-active");
         }
-        let tag = self.props.tag.clone();
+        let tag = tag.clone();
         html! {
-            <@{tag} class=classes onclick=self.props.onclick.clone()>
-                {self.props.children.clone()}
+            <@{tag} class={panel_classes} onclick={onclick.clone()}>
+                {children.clone()}
             </@>
         }
     }

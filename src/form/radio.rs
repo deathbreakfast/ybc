@@ -1,6 +1,9 @@
-use yew::events::InputData;
+use yew::events::InputEvent;
 use yew::prelude::*;
-use yewtil::NeqAssign;
+
+pub enum RadioMsg {
+    Selection(Option<String>),
+}
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct RadioProps {
@@ -33,42 +36,52 @@ pub struct RadioProps {
 /// All YBC form components are controlled components. This means that the value of the field must
 /// be provided from a parent component, and changes to this component are propagated to the parent
 /// component via callback.
-pub struct Radio {
-    props: RadioProps,
-    link: ComponentLink<Self>,
-}
+pub struct Radio;
 
 impl Component for Radio {
-    type Message = String;
+    type Message = RadioMsg;
     type Properties = RadioProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { props, link }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        self.props.update.emit(msg);
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            RadioMsg::Selection(selection) => {
+                if let Some(selection) = selection {
+                    ctx.props().update.emit(selection);
+                }
+            }
+        }
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("radio");
-        classes.push(&self.props.classes);
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let RadioProps {
+            children,
+            classes,
+            checked_value,
+            disabled,
+            name,
+            value,
+            ..
+        } = ctx.props();
+        let mut radio_classes = Classes::from("radio");
+        radio_classes.push(classes);
         html! {
-            <label class=classes disabled=self.props.disabled>
+            <label class={radio_classes} disabled={*disabled}>
                 <input
                     type="radio"
-                    name=self.props.name.clone()
-                    value=self.props.value.clone()
-                    checked=self.props.checked_value.as_ref().map(|val| val == &self.props.value).unwrap_or(false)
-                    oninput=self.link.callback(|data: InputData| data.value)
-                    disabled=self.props.disabled
+                    name={name.clone()}
+                    value={value.clone()}
+                    checked={checked_value.as_ref().map(|val| val == value).unwrap_or(false)}
+                    oninput={ctx.link().callback(|input: InputEvent| {
+                        RadioMsg::Selection(input.data())
+                    })}
+                    disabled={*disabled}
                     />
-                {self.props.children.clone()}
+                {children.clone()}
             </label>
         }
     }

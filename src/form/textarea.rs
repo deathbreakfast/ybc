@@ -1,9 +1,11 @@
-use yew::events::InputData;
+use yew::events::InputEvent;
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 use crate::Size;
-use std::borrow::Cow;
+
+pub enum TextAreaMsg {
+    Text(Option<String>),
+}
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct TextAreaProps {
@@ -50,55 +52,67 @@ pub struct TextAreaProps {
 /// All YBC form components are controlled components. This means that the value of the field must
 /// be provided from a parent component, and changes to this component are propagated to the parent
 /// component via callback.
-pub struct TextArea {
-    link: ComponentLink<Self>,
-    props: TextAreaProps,
-}
+pub struct TextArea;
 
 impl Component for TextArea {
-    type Message = String;
+    type Message = TextAreaMsg;
     type Properties = TextAreaProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { link, props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        self.props.update.emit(msg);
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            TextAreaMsg::Text(text) => {
+                if let Some(text) = text {
+                    ctx.props().update.emit(text);
+                }
+            }
+        };
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let TextAreaProps {
+            classes,
+            disabled,
+            fixed_size,
+            r#static,
+            loading,
+            name,
+            placeholder,
+            readonly,
+            rows,
+            size,
+            value,
+            ..
+        } = ctx.props();
+        let mut textarea_classes = Classes::from("textarea");
+        textarea_classes.push(classes);
+        if let Some(size) = &size {
+            textarea_classes.push(&size.to_string());
+        }
+        if *loading {
+            textarea_classes.push("is-loading");
+        }
+        if *r#static {
+            textarea_classes.push("is-static");
+        }
+        if *fixed_size {
+            textarea_classes.push("has-fixed-size");
+        }
 
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("textarea");
-        classes.push(&self.props.classes);
-        if let Some(size) = &self.props.size {
-            classes.push(&size.to_string());
-        }
-        if self.props.loading {
-            classes.push("is-loading");
-        }
-        if self.props.r#static {
-            classes.push("is-static");
-        }
-        if self.props.fixed_size {
-            classes.push("has-fixed-size");
-        }
-
-        let rows = Cow::from(self.props.rows.to_string());
         html! {
             <textarea
-                name=self.props.name.clone()
-                value=self.props.value.clone()
-                oninput=self.link.callback(|input: InputData| input.value)
-                class=classes
-                rows=rows
-                placeholder=self.props.placeholder.clone()
-                disabled=self.props.disabled
-                readonly=self.props.readonly
+                name={name.clone()}
+                value={value.clone()}
+                oninput={ctx.link().callback(|input: InputEvent| TextAreaMsg::Text(input.data()))}
+                class={textarea_classes}
+                rows={rows.to_string()}
+                placeholder={placeholder.clone()}
+                disabled={*disabled}
+                readonly={*readonly}
                 />
         }
     }

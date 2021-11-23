@@ -2,7 +2,6 @@
 
 use derive_more::Display;
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct TitleProps {
@@ -24,39 +23,34 @@ pub struct TitleProps {
 /// A simple heading to add depth to your page.
 ///
 /// [https://bulma.io/documentation/elements/title/](https://bulma.io/documentation/elements/title/)
-pub struct Title {
-    props: TitleProps,
-}
+pub struct Title;
 
 impl Component for Title {
     type Message = ();
     type Properties = TitleProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("title");
-        classes.push(&self.props.classes);
-        if let Some(size) = &self.props.size {
-            classes.push(&size.to_string());
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let TitleProps { children, classes, size, is_spaced, tag } = ctx.props();
+        let mut title_classes = Classes::from("title");
+        title_classes.push(classes);
+        if let Some(size) = &size {
+            title_classes.push(&size.to_string());
         }
-        if self.props.is_spaced {
-            classes.push("is-spaced");
+        if *is_spaced {
+            title_classes.push("is-spaced");
         }
-        let tag = self.props.tag.clone();
+        let tag = tag.clone();
         html! {
-            <@{tag} class=classes>
-                {self.props.children.clone()}
+            <@{tag} class={title_classes}>
+                {children.clone()}
             </@>
         }
     }
@@ -82,36 +76,31 @@ pub struct SubtitleProps {
 /// A simple heading to add depth to your page.
 ///
 /// [https://bulma.io/documentation/elements/title/](https://bulma.io/documentation/elements/title/)
-pub struct Subtitle {
-    props: SubtitleProps,
-}
+pub struct Subtitle;
 
 impl Component for Subtitle {
     type Message = ();
     type Properties = SubtitleProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("subtitle");
-        classes.push(&self.props.classes);
-        if let Some(size) = &self.props.size {
-            classes.push(&size.to_string());
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let SubtitleProps { classes, children, size, tag } = ctx.props();
+        let mut sub_title_classes = Classes::from("subtitle");
+        sub_title_classes.push(classes);
+        if let Some(size) = &size {
+            sub_title_classes.push(&size.to_string());
         }
-        let tag = self.props.tag.clone();
+        let tag = tag.clone();
         html! {
-            <@{tag} class=classes>
-                {self.props.children.clone()}
+            <@{tag} class={sub_title_classes}>
+                {children.clone()}
             </@>
         }
     }

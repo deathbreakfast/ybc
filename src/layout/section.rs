@@ -1,6 +1,5 @@
 use derive_more::Display;
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct SectionProps {
@@ -16,35 +15,30 @@ pub struct SectionProps {
 /// A simple container to divide your page into sections.
 ///
 /// [https://bulma.io/documentation/layout/section/](https://bulma.io/documentation/layout/section/)
-pub struct Section {
-    props: SectionProps,
-}
+pub struct Section;
 
 impl Component for Section {
     type Message = ();
     type Properties = SectionProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("section");
-        classes.push(&self.props.classes);
-        if let Some(size) = &self.props.size {
-            classes.push(&size.to_string());
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let SectionProps { children, classes, size } = ctx.props();
+        let mut section_classes = Classes::from("section");
+        section_classes.push(classes);
+        if let Some(size) = &size {
+            section_classes.push(&size.to_string());
         }
         html! {
-            <section class=classes>
-                {self.props.children.clone()}
+            <section class={section_classes}>
+                {children.clone()}
             </section>
         }
     }

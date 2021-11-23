@@ -1,5 +1,4 @@
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct BlockProps {
@@ -12,32 +11,27 @@ pub struct BlockProps {
 /// Bulma’s most basic spacer block
 ///
 /// [https://bulma.io/documentation/elements/block/](https://bulma.io/documentation/elements/block/)
-pub struct Block {
-    props: BlockProps,
-}
+pub struct Block;
 
 impl Component for Block {
     type Message = ();
     type Properties = BlockProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("block");
-        classes.push(&self.props.classes);
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let BlockProps { children, classes } = ctx.props();
+        let mut block_classes = Classes::from("block");
+        block_classes.push(classes);
         html! {
-            <div class=classes>
-                {self.props.children.clone()}
+            <div class={block_classes}>
+                {children.clone()}
             </div>
         }
     }

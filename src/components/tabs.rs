@@ -1,5 +1,4 @@
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 use crate::{Alignment, Size};
 
@@ -35,51 +34,55 @@ pub struct TabsProps {
 ///
 /// For integration with Yew Router, it is recommended that the `RouterButton` or `RouterAnchor`
 /// components be used as the individual tab elements for this component.
-pub struct Tabs {
-    props: TabsProps,
-}
+pub struct Tabs;
 
 impl Component for Tabs {
     type Message = ();
     type Properties = TabsProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("tabs");
-        classes.push(&self.props.classes);
-        if let Some(alignment) = &self.props.alignment {
-            classes.push(&alignment.to_string());
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let TabsProps {
+            alignment,
+            boxed,
+            children,
+            classes,
+            fullwidth,
+            rounded,
+            size,
+            toggle,
+        } = ctx.props();
+        let mut tabs_classes = Classes::from("tabs");
+        tabs_classes.push(classes);
+        if let Some(alignment) = &alignment {
+            tabs_classes.push(&alignment.to_string());
         }
-        if let Some(size) = &self.props.size {
-            classes.push(&size.to_string());
+        if let Some(size) = &size {
+            tabs_classes.push(&size.to_string());
         }
-        if self.props.boxed {
-            classes.push("is-boxed");
+        if *boxed {
+            tabs_classes.push("is-boxed");
         }
-        if self.props.toggle {
-            classes.push("is-toggle");
+        if *toggle {
+            tabs_classes.push("is-toggle");
         }
-        if self.props.rounded {
-            classes.push("is-rounded");
+        if *rounded {
+            tabs_classes.push("is-rounded");
         }
-        if self.props.fullwidth {
-            classes.push("is-fullwidth");
+        if *fullwidth {
+            tabs_classes.push("is-fullwidth");
         }
         html! {
-            <div class=classes>
+            <div class={classes}>
                 <ul>
-                    {self.props.children.clone()}
+                    {children.clone()}
                 </ul>
             </div>
         }

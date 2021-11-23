@@ -1,7 +1,6 @@
 #![allow(clippy::redundant_closure_call)]
 
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 use crate::Size;
 
@@ -31,42 +30,45 @@ pub struct TagProps {
 /// A small tag label to insert anywhere.
 ///
 /// [https://bulma.io/documentation/elements/tag/](https://bulma.io/documentation/elements/tag/)
-pub struct Tag {
-    props: TagProps,
-}
+pub struct Tag;
 
 impl Component for Tag {
     type Message = ();
     type Properties = TagProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("tag");
-        classes.push(&self.props.classes);
-        if self.props.rounded {
-            classes.push("is-rounded");
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let TagProps {
+            children,
+            classes,
+            delete,
+            onclick,
+            rounded,
+            size,
+            tag,
+        } = ctx.props();
+        let mut tag_classes = Classes::from("tag");
+        tag_classes.push(classes);
+        if *rounded {
+            tag_classes.push("is-rounded");
         }
-        if self.props.delete {
-            classes.push("is-delete");
+        if *delete {
+            tag_classes.push("is-delete");
         }
-        if let Some(size) = &self.props.size {
-            classes.push(&size.to_string());
+        if let Some(size) = &size {
+            tag_classes.push(&size.to_string());
         }
-        let tag = self.props.tag.clone();
+        let tag = tag.clone();
         html! {
-            <@{tag} class=classes onclick=self.props.onclick.clone()>
-                {self.props.children.clone()}
+            <@{tag} class={tag_classes} onclick={onclick.clone()}>
+                {children.clone()}
             </@>
         }
     }
@@ -89,35 +91,30 @@ pub struct TagsProps {
 /// A container for a list of tags.
 ///
 /// [https://bulma.io/documentation/elements/tag/](https://bulma.io/documentation/elements/tag/)
-pub struct Tags {
-    props: TagsProps,
-}
+pub struct Tags;
 
 impl Component for Tags {
     type Message = ();
     type Properties = TagsProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("tags");
-        classes.push(&self.props.classes);
-        if self.props.has_addons {
-            classes.push("has-addons");
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let TagsProps { children, classes, has_addons } = ctx.props();
+        let mut tags_classes = Classes::from("tags");
+        tags_classes.push(classes);
+        if *has_addons {
+            tags_classes.push("has-addons");
         }
         html! {
-            <div class=classes>
-                {self.props.children.clone()}
+            <div class={tags_classes}>
+                {children.clone()}
             </div>
         }
     }

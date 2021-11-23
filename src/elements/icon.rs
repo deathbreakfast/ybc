@@ -1,6 +1,5 @@
 use yew::events::MouseEvent;
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 use crate::{Alignment, Size};
 
@@ -24,38 +23,33 @@ pub struct IconProps {
 /// A container for any type of icon font.
 ///
 /// [https://bulma.io/documentation/elements/icon/](https://bulma.io/documentation/elements/icon/)
-pub struct Icon {
-    props: IconProps,
-}
+pub struct Icon;
 
 impl Component for Icon {
     type Message = ();
     type Properties = IconProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("icon");
-        classes.push(&self.props.classes);
-        if let Some(size) = &self.props.size {
-            classes.push(&size.to_string());
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let IconProps { alignment, children, classes, onclick, size } = ctx.props();
+        let mut icon_classes = Classes::from("icon");
+        icon_classes.push(classes);
+        if let Some(size) = &size {
+            icon_classes.push(&size.to_string());
         }
-        if let Some(alignment) = &self.props.alignment {
-            classes.push(&alignment.to_string());
+        if let Some(alignment) = &alignment {
+            icon_classes.push(&alignment.to_string());
         }
         html! {
-            <span class=classes onclick=self.props.onclick.clone()>
-                {self.props.children.clone()}
+            <span class={icon_classes} onclick={onclick.clone()}>
+                {children.clone()}
             </span>
         }
     }

@@ -1,5 +1,8 @@
 use yew::prelude::*;
-use yewtil::NeqAssign;
+
+pub enum CheckboxMsg {
+    Checked(bool),
+}
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct CheckboxProps {
@@ -25,42 +28,40 @@ pub struct CheckboxProps {
 /// All YBC form components are controlled components. This means that the value of the field must
 /// be provided from a parent component, and changes to this component are propagated to the parent
 /// component via callback.
-pub struct Checkbox {
-    props: CheckboxProps,
-    link: ComponentLink<Self>,
-}
+pub struct Checkbox;
 
 impl Component for Checkbox {
-    type Message = bool;
+    type Message = CheckboxMsg;
     type Properties = CheckboxProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { props, link }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        self.props.update.emit(msg);
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            CheckboxMsg::Checked(checked) => {
+                ctx.props().update.emit(checked);
+            }
+        }
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("checkbox");
-        classes.push(&self.props.classes);
-        let checked = self.props.checked;
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let CheckboxProps { children, classes, checked, disabled, name, .. } = ctx.props();
+        let mut checkbox_classes = Classes::from("checkbox");
+        checkbox_classes.push(classes);
+        let checked_value = *checked;
         html! {
-            <label class=classes disabled=self.props.disabled>
+            <label class={checkbox_classes} disabled={*disabled}>
                 <input
                     type="checkbox"
-                    checked=self.props.checked
-                    name=self.props.name.clone()
-                    onclick=self.link.callback(move |_| !checked)
-                    disabled=self.props.disabled
+                    checked={*checked}
+                    name={name.clone()}
+                    onclick={ctx.link().callback(move |_| CheckboxMsg::Checked(!checked_value))}
+                    disabled={*disabled}
                     />
-                {self.props.children.clone()}
+                {children.clone()}
             </label>
         }
     }

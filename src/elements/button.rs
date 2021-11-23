@@ -1,7 +1,6 @@
 use derive_more::Display;
 use yew::events::{Event, FocusEvent, MouseEvent};
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct ButtonsProps {
@@ -17,35 +16,30 @@ pub struct ButtonsProps {
 /// A container for a group of buttons.
 ///
 /// [https://bulma.io/documentation/elements/button/](https://bulma.io/documentation/elements/button/)
-pub struct Buttons {
-    props: ButtonsProps,
-}
+pub struct Buttons;
 
 impl Component for Buttons {
     type Message = ();
     type Properties = ButtonsProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("buttons");
-        classes.push(&self.props.classes);
-        if let Some(size) = &self.props.size {
-            classes.push(&size.to_string());
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let ButtonsProps { children, classes, size } = ctx.props();
+        let mut button_classes = Classes::from("buttons");
+        button_classes.push(classes);
+        if let Some(size) = &size {
+            button_classes.push(&size.to_string());
         }
         html! {
-            <div class=classes>
-                {self.props.children.clone()}
+            <div class={button_classes}>
+                {children.clone()}
             </div>
         }
     }
@@ -91,38 +85,40 @@ pub struct ButtonProps {
 /// A button element.
 ///
 /// [https://bulma.io/documentation/elements/button/](https://bulma.io/documentation/elements/button/)
-pub struct Button {
-    props: ButtonProps,
-}
+pub struct Button;
 
 impl Component for Button {
     type Message = ();
     type Properties = ButtonProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("button");
-        classes.push(&self.props.classes);
-        if self.props.loading {
-            classes.push("is-loading")
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let ButtonProps {
+            children,
+            classes,
+            disabled,
+            onclick,
+            loading,
+            r#static,
+        } = ctx.props();
+        let mut button_classes = Classes::from("button");
+        button_classes.push(classes);
+        if *loading {
+            button_classes.push("is-loading")
         }
-        if self.props.r#static {
-            classes.push("is-static")
+        if *r#static {
+            button_classes.push("is-static")
         }
         html! {
-            <button class=classes onclick=self.props.onclick.clone() disabled=self.props.disabled>
-                {self.props.children.clone()}
+            <button class={button_classes} onclick={onclick.clone()} disabled={*disabled}>
+                {children.clone()}
             </button>
         }
     }
@@ -281,45 +277,50 @@ pub struct ButtonAnchorProps {
 /// An anchor element styled as a button.
 ///
 /// [https://bulma.io/documentation/elements/button/](https://bulma.io/documentation/elements/button/)
-pub struct ButtonAnchor {
-    props: ButtonAnchorProps,
-}
+pub struct ButtonAnchor;
 
 impl Component for ButtonAnchor {
     type Message = ();
     type Properties = ButtonAnchorProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("button");
-        classes.push(&self.props.classes);
-        if self.props.loading {
-            classes.push("is-loading")
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let ButtonAnchorProps {
+            children,
+            classes,
+            disabled,
+            href,
+            loading,
+            onclick,
+            target,
+            r#static,
+            rel,
+        } = ctx.props();
+        let mut button_classes = Classes::from("button");
+        button_classes.push(classes);
+        if *loading {
+            button_classes.push("is-loading")
         }
-        if self.props.r#static {
-            classes.push("is-static")
+        if *r#static {
+            button_classes.push("is-static")
         }
         html! {
             <a
-                class=classes
-                onclick=self.props.onclick.clone()
-                href=self.props.href.clone()
-                rel=self.props.rel.clone().unwrap_or_default()
-                target=self.props.target.clone().unwrap_or_default()
-                disabled=self.props.disabled
+                class={button_classes}
+                onclick={onclick.clone()}
+                href={href.clone()}
+                rel={rel.clone().unwrap_or_default()}
+                target={target.clone().unwrap_or_default()}
+                disabled={*disabled}
             >
-                {self.props.children.clone()}
+                {children.clone()}
             </a>
         }
     }
@@ -349,37 +350,32 @@ pub struct ButtonInputSubmitProps {
 /// An input element with `type="submit"` styled as a button.
 ///
 /// [https://bulma.io/documentation/elements/button/](https://bulma.io/documentation/elements/button/)
-pub struct ButtonInputSubmit {
-    props: ButtonInputSubmitProps,
-}
+pub struct ButtonInputSubmit;
 
 impl Component for ButtonInputSubmit {
     type Message = ();
     type Properties = ButtonInputSubmitProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("button");
-        classes.push(&self.props.classes);
-        if self.props.loading {
-            classes.push("is-loading")
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let ButtonInputSubmitProps { classes, disabled, loading, onsubmit, r#static } = ctx.props();
+        let mut button_classes = Classes::from("button");
+        button_classes.push(classes);
+        if *loading {
+            button_classes.push("is-loading")
         }
-        if self.props.r#static {
-            classes.push("is-static")
+        if *r#static {
+            button_classes.push("is-static")
         }
         html! {
-            <input type="submit" class=classes onsubmit=self.props.onsubmit.clone() disabled=self.props.disabled/>
+            <input type="submit" class={button_classes} onsubmit={onsubmit.clone()} disabled={*disabled} />
         }
     }
 }
@@ -408,37 +404,32 @@ pub struct ButtonInputResetProps {
 /// An input element with `type="reset"` styled as a button.
 ///
 /// [https://bulma.io/documentation/elements/button/](https://bulma.io/documentation/elements/button/)
-pub struct ButtonInputReset {
-    props: ButtonInputResetProps,
-}
+pub struct ButtonInputReset;
 
 impl Component for ButtonInputReset {
     type Message = ();
     type Properties = ButtonInputResetProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("button");
-        classes.push(&self.props.classes);
-        if self.props.loading {
-            classes.push("is-loading")
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let ButtonInputResetProps { classes, disabled, onreset, loading, r#static } = ctx.props();
+        let mut button_classes = Classes::from("button");
+        button_classes.push(classes);
+        if *loading {
+            button_classes.push("is-loading")
         }
-        if self.props.r#static {
-            classes.push("is-static")
+        if *r#static {
+            button_classes.push("is-static")
         }
         html! {
-            <input type="reset" class=classes onreset=self.props.onreset.clone() disabled=self.props.disabled/>
+            <input type="reset" class={button_classes} onreset={onreset.clone()} disabled={*disabled} />
         }
     }
 }

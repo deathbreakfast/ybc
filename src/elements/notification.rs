@@ -1,5 +1,4 @@
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct NotificationProps {
@@ -12,32 +11,26 @@ pub struct NotificationProps {
 /// Bold notification blocks, to alert your users of something.
 ///
 /// [https://bulma.io/documentation/elements/notification/](https://bulma.io/documentation/elements/notification/)
-pub struct Notification {
-    props: NotificationProps,
-}
+pub struct Notification;
 
 impl Component for Notification {
     type Message = ();
     type Properties = NotificationProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("notification");
-        classes.push(&self.props.classes);
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let NotificationProps { children, classes } = ctx.props();
+        let mut notification_classes = Classes::from("notification");
+        notification_classes.push(classes);
         html! {
-            <div class=classes>
-                {self.props.children.clone()}
+            <div class={notification_classes}> {children.clone()}
             </div>
         }
     }

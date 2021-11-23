@@ -1,5 +1,4 @@
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct ColumnsProps {
@@ -21,41 +20,36 @@ pub struct ColumnsProps {
 /// The container for a set of responsive columns.
 ///
 /// [https://bulma.io/documentation/columns/](https://bulma.io/documentation/columns/)
-pub struct Columns {
-    props: ColumnsProps,
-}
+pub struct Columns;
 
 impl Component for Columns {
     type Message = ();
     type Properties = ColumnsProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("columns");
-        classes.push(&self.props.classes);
-        if self.props.vcentered {
-            classes.push("is-vcentered");
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let ColumnsProps { centered, children, classes, multiline, vcentered } = ctx.props();
+        let mut columns_classes = Classes::from("columns");
+        columns_classes.push(classes);
+        if *vcentered {
+            columns_classes.push("is-vcentered");
         }
-        if self.props.multiline {
-            classes.push("is-multiline");
+        if *multiline {
+            columns_classes.push("is-multiline");
         }
-        if self.props.centered {
-            classes.push("is-centered");
+        if *centered {
+            columns_classes.push("is-centered");
         }
         html! {
-            <div class=classes>
-                {self.props.children.clone()}
+            <div class={columns_classes}>
+                {children.clone()}
             </div>
         }
     }
@@ -79,32 +73,27 @@ pub struct ColumnProps {
 /// This component has a very large number of valid class combinations which users may want.
 /// Modelling all of these is particularly for this component, so for now you are encouraged to
 /// add classes to this Component manually via the `classes` prop.
-pub struct Column {
-    props: ColumnProps,
-}
+pub struct Column;
 
 impl Component for Column {
     type Message = ();
     type Properties = ColumnProps;
 
-    fn create(props: Self::Properties, _: ComponentLink<Self>) -> Self {
-        Self { props }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, _: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("column");
-        classes.push(&self.props.classes);
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let ColumnProps { children, classes } = ctx.props();
+        let mut column_classes = Classes::from("column");
+        column_classes.push(classes);
         html! {
-            <div class=classes>
-                {self.props.children.clone()}
+            <div class={column_classes}>
+                {children.clone()}
             </div>
         }
     }

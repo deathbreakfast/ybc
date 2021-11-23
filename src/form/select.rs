@@ -1,10 +1,15 @@
 #![allow(clippy::redundant_closure_call)]
 
-use yew::events::ChangeData;
+use wasm_bindgen::JsCast;
+use web_sys::{EventTarget, HtmlSelectElement};
+use yew::events::Event;
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 use crate::Size;
+
+pub enum SelectMsg {
+    Text(String),
+}
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct SelectProps {
@@ -43,49 +48,57 @@ pub struct SelectProps {
 /// **NOTE WELL:** not all browsers will honor the value of the select element's value on initial
 /// load. So if you have an initial `value` set for this component, ensure that the corresponding
 /// option element also has the `selected=true` attribute.
-pub struct Select {
-    props: SelectProps,
-    link: ComponentLink<Self>,
-}
+pub struct Select;
 
 impl Component for Select {
-    type Message = String;
+    type Message = SelectMsg;
     type Properties = SelectProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { props, link }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        self.props.update.emit(msg);
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            SelectMsg::Text(text) => {
+                ctx.props().update.emit(text);
+            }
+        };
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("select");
-        classes.push(&self.props.classes);
-        if let Some(size) = &self.props.size {
-            classes.push(&size.to_string());
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let SelectProps {
+            children,
+            classes,
+            disabled,
+            name,
+            size,
+            loading,
+            value,
+            ..
+        } = ctx.props();
+        let mut select_classes = Classes::from("select");
+        select_classes.push(classes);
+        if let Some(size) = &size {
+            select_classes.push(&size.to_string());
         }
-        if self.props.loading {
-            classes.push("is-loading");
+        if *loading {
+            select_classes.push("is-loading");
         }
         html! {
-            <div class=classes>
+            <div class={select_classes}>
                 <select
-                    name=self.props.name.clone()
-                    value=self.props.value.clone()
-                    disabled=self.props.disabled
-                    onchange=self.link.callback(|change: ChangeData| match change {
-                        ChangeData::Select(data) => data.value(),
-                        _ => unreachable!("invariant violation: received non-select change event from a select element"),
-                    })
+                    name={name.clone()}
+                    value={value.clone()}
+                    disabled={*disabled}
+                    onchange={ctx.link().batch_callback(|event: Event| {
+                        let target: Option<EventTarget> = event.target();
+                        let select = target.and_then(|t| t.dyn_into::<HtmlSelectElement>().ok());
+                        select.map(|select| SelectMsg::Text(select.value()))
+                    })}
                 >
-                    {self.props.children.clone()}
+                    {children.clone()}
                 </select>
             </div>
         }
@@ -94,6 +107,10 @@ impl Component for Select {
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+
+pub enum MultiSelectMsg {
+    Selections(Vec<String>),
+}
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct MultiSelectProps {
@@ -135,59 +152,72 @@ pub struct MultiSelectProps {
 /// **NOTE WELL:** not all browsers will honor the value of the select element's value on initial
 /// load. So if you have an initial `value` set for this component, ensure that the corresponding
 /// option element also has the `selected=true` attribute.
-pub struct MultiSelect {
-    props: MultiSelectProps,
-    link: ComponentLink<Self>,
-}
+pub struct MultiSelect;
 
 impl Component for MultiSelect {
-    type Message = Vec<String>;
+    type Message = MultiSelectMsg;
     type Properties = MultiSelectProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { props, link }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        self.props.update.emit(msg);
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            MultiSelectMsg::Selections(selections) => {
+                ctx.props().update.emit(selections);
+            }
+        }
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("select is-multiple");
-        classes.push(&self.props.classes);
-        if let Some(size) = &self.props.size {
-            classes.push(&size.to_string());
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let MultiSelectProps {
+            children,
+            classes,
+            disabled,
+            loading,
+            list_size,
+            name,
+            size,
+            value,
+            ..
+        } = ctx.props();
+        let mut select_classes = Classes::from("select is-multiple");
+        select_classes.push(classes);
+        if let Some(size) = &size {
+            select_classes.push(&size.to_string());
         }
-        if self.props.loading {
-            classes.push("is-loading");
+        if *loading {
+            select_classes.push("is-loading");
         }
 
-        let size: String = self.props.list_size.to_string();
+        let size: String = list_size.to_string();
         html! {
-            <div class=classes>
+            <div class={select_classes}>
                 <select
                     multiple=true
-                    size=size
-                    name=self.props.name.clone()
-                    value=self.props.value.join(",")
-                    disabled=self.props.disabled
-                    onchange=self.link.callback(|change: ChangeData| match change {
-                        ChangeData::Select(data) => {
-                            let opts = data.selected_options();
-                            (0..opts.length()).into_iter()
+                    size={size}
+                    name={name.clone()}
+                    value={value.join(",")}
+                    disabled={*disabled}
+                    onchange={ctx.link().batch_callback(|event: Event| {
+                        let target: Option<EventTarget> = event.target();
+                        let select = target
+                            .and_then(|t| t.dyn_into::<HtmlSelectElement>().ok());
+                        select.map(|select| {
+                            let opts = select.selected_options();
+                            let opts = (0..opts.length()).into_iter()
                                 .filter_map(|idx| opts.item(idx))
-                                .filter_map(|elem| elem.get_attribute("value").or_else(|| elem.text_content()))
-                                .collect::<Vec<_>>()
-                        }
-                        _ => unreachable!("invariant violation: received non-select change event from a select element"),
-                    })
+                                .filter_map(|elem| elem.get_attribute("value")
+                                    .or_else(|| elem.text_content())
+                                )
+                                .collect::<Vec<_>>();
+                            MultiSelectMsg::Selections(opts)
+                        })
+                    })}
                 >
-                    {self.props.children.clone()}
+                    {children.clone()}
                 </select>
             </div>
         }

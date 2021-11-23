@@ -1,11 +1,14 @@
 #![allow(clippy::redundant_closure_call)]
 
 use derive_more::Display;
-use yew::events::InputData;
+use yew::events::InputEvent;
 use yew::prelude::*;
-use yewtil::NeqAssign;
 
 use crate::Size;
+
+pub enum InputMsg {
+    Text(Option<String>),
+}
 
 #[derive(Clone, Debug, Properties, PartialEq)]
 pub struct InputProps {
@@ -51,53 +54,66 @@ pub struct InputProps {
 /// All YBC form components are controlled components. This means that the value of the field must
 /// be provided from a parent component, and changes to this component are propagated to the parent
 /// component via callback.
-pub struct Input {
-    props: InputProps,
-    link: ComponentLink<Self>,
-}
+pub struct Input;
 
 impl Component for Input {
-    type Message = String;
+    type Message = InputMsg;
     type Properties = InputProps;
 
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { props, link }
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {}
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        self.props.update.emit(msg);
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            InputMsg::Text(text) => {
+                if let Some(text) = text {
+                    ctx.props().update.emit(text);
+                }
+            }
+        }
         false
     }
 
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(props)
-    }
-
-    fn view(&self) -> Html {
-        let mut classes = Classes::from("input");
-        classes.push(&self.props.classes);
-        if let Some(size) = &self.props.size {
-            classes.push(&size.to_string());
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let InputProps {
+            classes,
+            disabled,
+            size,
+            rounded,
+            loading,
+            name,
+            placeholder,
+            readonly,
+            r#static,
+            r#type,
+            value,
+            ..
+        } = ctx.props();
+        let mut input_classes = Classes::from("input");
+        input_classes.push(classes);
+        if let Some(size) = &size {
+            input_classes.push(&size.to_string());
         }
-        if self.props.rounded {
-            classes.push("is-rounded");
+        if *rounded {
+            input_classes.push("is-rounded");
         }
-        if self.props.loading {
-            classes.push("is-loading");
+        if *loading {
+            input_classes.push("is-loading");
         }
-        if self.props.r#static {
-            classes.push("is-static");
+        if *r#static {
+            input_classes.push("is-static");
         }
         html! {
             <input
-                name=self.props.name.clone()
-                value=self.props.value.clone()
-                oninput=self.link.callback(|input: InputData| input.value)
-                class=classes
-                type=self.props.r#type.to_string()
-                placeholder=self.props.placeholder.clone()
-                disabled=self.props.disabled
-                readonly=self.props.readonly
+                name={name.clone()}
+                value={value.clone()}
+                oninput={ctx.link().callback(|input: InputEvent| InputMsg::Text(input.data()))}
+                class={input_classes}
+                type={r#type.to_string()}
+                placeholder={placeholder.clone()}
+                disabled={*disabled}
+                readonly={*readonly}
                 />
         }
     }
