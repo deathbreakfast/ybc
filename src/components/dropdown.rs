@@ -72,7 +72,13 @@ impl Component for Dropdown {
         };
         let overlay = if self.is_menu_active {
             dropdown_classes.push("is-active");
-            html! {<div onclick={ctx.link().callback(|_| DropdownMsg::Close)} style="z-index:10;background-color:rgba(0,0,0,0);position:fixed;top:0;bottom:0;left:0;right:0;"></div>}
+            html! {
+                <div
+                    onclick={ctx.link().callback(|_| DropdownMsg::Close)}
+                    style="z-index:10;background-color:rgba(0,0,0,0);position:fixed;top:0;bottom:0;left:0;right:0;"
+                >
+                </div>
+            }
         } else {
             html! {}
         };
@@ -85,7 +91,7 @@ impl Component for Dropdown {
                     </Button>
                 </div>
                 <div class="dropdown-menu" role="menu">
-                    <div class="dropdown-content">
+                    <div class="dropdown-content" onclick={ctx.link().callback(|_| DropdownMsg::Close)}>
                         {children.clone()}
                     </div>
                 </div>

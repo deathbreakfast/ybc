@@ -1,6 +1,8 @@
 #![allow(clippy::redundant_closure_call)]
 
 use derive_more::Display;
+use wasm_bindgen::JsCast;
+use web_sys::{EventTarget, HtmlInputElement};
 use yew::events::InputEvent;
 use yew::prelude::*;
 
@@ -108,7 +110,11 @@ impl Component for Input {
             <input
                 name={name.clone()}
                 value={value.clone()}
-                oninput={ctx.link().callback(|input: InputEvent| InputMsg::Text(input.data()))}
+                oninput={ctx.link().callback(|input: InputEvent| {
+                    let target: Option<EventTarget> = input.target();
+                    let element = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+                    InputMsg::Text(element.map(|m| m.value()))
+                })}
                 class={input_classes}
                 type={r#type.to_string()}
                 placeholder={placeholder.clone()}
